@@ -1,0 +1,35 @@
+version: '3.2'
+services:
+
+  postgresql:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=db_main
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=123
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgresql
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - data:/var/lib/postgresql/data/
+    ports:
+      - "3306:3306"
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+
+  go:
+    image: golang:latest
+    restart: on-failure
+    working_dir: /usr/src/myapp
+    volumes:
+      - .:/usr/src/myapp
+
+
+volumes:
+  data: {}
