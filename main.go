@@ -18,17 +18,10 @@ const (
 
 func main() {
 	log.Print("hi!")
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
+	db := getConnect()
 	defer db.Close()
 
-	err = db.Ping()
+	err := db.Ping()
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +36,7 @@ func main() {
 	time.Sleep(60 * time.Second)
 }
 
-func inserter(num int) {
+func getConnect() *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -52,17 +45,22 @@ func inserter(num int) {
 	if err != nil {
 		panic(err)
 	}
+
+	return db
+}
+
+func inserter(num int) {
+	db := getConnect()
 	defer db.Close()
 
 	sqlStatement := `
-INSERT INTO data (num)
-VALUES ($1)`
+		INSERT INTO data (num)
+		VALUES ($1)`
 
 	for i := 0; i < 2000; i++ {
-		_, err = db.Exec(sqlStatement, num)
+		_, err := db.Exec(sqlStatement, num)
 		if err != nil {
 			panic(err)
 		}
 	}
-
 }
