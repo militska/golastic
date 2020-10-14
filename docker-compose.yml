@@ -27,7 +27,3 @@ services:
     working_dir: /go/src/myapp
     volumes:
       - .:/go/src/myapp
-
-
-volumes:
-  data: {}
