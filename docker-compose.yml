@@ -21,7 +21,6 @@ services:
       - 8080:8080
 
   app:
-#    image: golang:latest
     build:
       context: ./docker/go
     restart: on-failure
