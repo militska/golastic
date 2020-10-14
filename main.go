@@ -5,7 +5,7 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
-	"time"
+	"sync"
 )
 
 const (
@@ -28,12 +28,14 @@ func main() {
 
 	fmt.Println("Successfully connected!")
 
-	go inserter(22)
-	go inserter(44)
-	go inserter(55)
-	go inserter(60)
+	var wg sync.WaitGroup
 
-	time.Sleep(60 * time.Second)
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go inserter(i+20, &wg)
+	}
+
+	wg.Wait()
 }
 
 func getConnect() *sql.DB {
@@ -49,16 +51,23 @@ func getConnect() *sql.DB {
 	return db
 }
 
-func inserter(num int) {
+func inserter(num int, group *sync.WaitGroup) {
 	db := getConnect()
-	defer db.Close()
+	defer func() {
+		group.Done()
+		err := db.Close()
+
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	sqlStatement := `
-		INSERT INTO data (num)
-		VALUES ($1)`
+		INSERT INTO data (name, description)
+		VALUES ($1, $2)`
 
-	for i := 0; i < 2000; i++ {
-		_, err := db.Exec(sqlStatement, num)
+	for i := 0; i < 4000; i++ {
+		_, err := db.Exec(sqlStatement, num, num)
 		if err != nil {
 			panic(err)
 		}
