@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+//** Инсерт без горутин
 func v1() {
 	start := time.Now()
 	for i := 0; i < 4; i++ {
