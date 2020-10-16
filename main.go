@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
 	"sync"
 	"time"
 )
@@ -70,7 +69,6 @@ func getConnect() *sql.DB {
 func inserter(num int, group *sync.WaitGroup, db *sql.DB) {
 	defer group.Done()
 
-	log.Print(db.Stats().OpenConnections)
 	sqlStatement := `
 		INSERT INTO data (name, description)
 		VALUES ($1, $2)`
